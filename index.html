@@ -1,10 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
     <title>Digital Twin for the INYO CAB</title>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <!--Import Scripts-->
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@v0.163.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@v0.163.0/examples/jsm/"
+        }
+      }
+    </script>
 </head>
 
 <body>
-    <h1>Development Page for digital Twin Applications</h1>
+    <div class="header">
+        <h1>Test Page for Digital Twin Applications</h1>
+    </div>
+    <div class="application" id="threejs-app">
+        <script type="module" src="/main.js"></script>
+    </div>
+    
 </body>
 </html> 
