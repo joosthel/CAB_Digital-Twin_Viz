@@ -66,7 +66,6 @@ groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
 //Create Lights
-
 //Fill Light
 const fillLight = new THREE.PointLight(0xFFFFFF, 5, 20, 100);
 fillLight.position.set(2,4,2);
@@ -109,9 +108,16 @@ function resizeRendererToContainer() {
 window.addEventListener('resize', resizeRendererToContainer);
 resizeRendererToContainer();
 
+//Create Clock for animation timing
+const clock = new THREE.Clock();
+
 //Setup Animate Function to make everything visible
 function animate() {
     requestAnimationFrame(animate);
+    //Animation
+    const delta = clock.getDelta();
+    modelLoader.mixers.forEach((mixer) => mixer.update(delta));
+    //Scene
     renderer.render(scene, camera);
     controls.update();
 }

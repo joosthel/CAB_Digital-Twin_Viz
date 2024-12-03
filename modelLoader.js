@@ -27,10 +27,36 @@ class SceneModelLoader {
                         opacity: 0.3,
                         roughness: 0.1
                     }
-                }]
+                }],
+                animations: {
+                    play: true,
+                    loop: THREE.LoopRepeat,
+                    speed: 1.0,
+                }
+            },
+            {
+                path: '241202_CAB_Door.gltf',
+                position: [-1.2, 0.045, 0],
+                scale: [1, 1, 1],
+                rotation: [0, 0, 0],
+                //Specify Material config here
+                materials: [{
+                    name: 'EX_Window',
+                    properties: {
+                        transparent: true,
+                        opacity: 0.3,
+                        roughness: 0.1
+                    }
+                }],
+                animations: {
+                    play: true,
+                    loop: THREE.LoopRepeat,
+                    speed: 1.0,
+                }
             },
             // Add more models here as needed
         ];
+        this.mixers = [];
         this.MaterialModifications = [];
     }
 
@@ -40,25 +66,27 @@ class SceneModelLoader {
         return this;
     }
 
-    // Load all configured models
     loadModels() {
         this.models.forEach((modelData) => {
             this.loader.load(
-                modelData.path, 
+                modelData.path,
                 (gltf) => {
                     const mesh = gltf.scene;
+                    
+                    // Set position, scale, and rotation
+                    if (modelData.position) mesh.position.set(...modelData.position);
+                    if (modelData.scale) mesh.scale.set(...modelData.scale);
+                    if (modelData.rotation) mesh.rotation.set(...modelData.rotation);
 
-                    // Apply shadows and Material changes
+                    // Apply shadows and material changes
                     mesh.traverse((child) => {
                         if (child.isMesh) {
                             child.castShadow = true;
                             child.receiveShadow = true;
-
-                            //Material Changes
+    
                             if (modelData.materials) {
                                 modelData.materials.forEach((materialConfig) => {
                                     if (child.material && child.material.name === materialConfig.name) {
-                                        // Apply each specified property
                                         Object.keys(materialConfig.properties).forEach((prop) => {
                                             child.material[prop] = materialConfig.properties[prop];
                                         });
@@ -66,52 +94,34 @@ class SceneModelLoader {
                                     }
                                 });
                             }
-                            
                         }
                     });
 
-                    // Set position
-                    if (modelData.position) {
-                        mesh.position.set(
-                            modelData.position[0],
-                            modelData.position[1],
-                            modelData.position[2]
-                        );
-                    }
+                    // Add animation playback if animations exist
+                    if (gltf.animations.length > 0) {
+                    const mixer = new THREE.AnimationMixer(mesh);
+                    const action = mixer.clipAction(gltf.animations[0]);
+                    action.loop = modelData.animations.loop || THREE.LoopRepeat;
+                    action.timeScale = modelData.animations.speed || 1.0;
+                    if (modelData.animations.play) action.play();
 
-                    // Set scale
-                    if (modelData.scale) {
-                        mesh.scale.set(
-                            modelData.scale[0],
-                            modelData.scale[1],
-                            modelData.scale[2]
-                        );
-                    }
-
-                    // Set rotation
-                    if (modelData.rotation) {
-                        mesh.rotation.set(
-                            modelData.rotation[0],
-                            modelData.rotation[1],
-                            modelData.rotation[2]
-                        );
-                    }
-
+                    this.mixers.push(mixer); // Store mixer for update in the animation loop
+                }
+    
                     this.scene.add(mesh);
                 },
-                // Progress callback (optional)
                 (xhr) => {
-                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                    console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
                 },
-                // Error callback (optional)
                 (error) => {
                     console.error('An error occurred while loading the model:', error);
                 }
             );
         });
-
+    
         return this;
     }
-}
+    
+    }
 
 export default SceneModelLoader;
