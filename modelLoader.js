@@ -50,8 +50,8 @@ class SceneModelLoader {
                 }],
                 animations: {
                     play: true,
-                    loop: THREE.LoopRepeat,
-                    speed: 1.0,
+                    //loop: THREE.LoopRepeat,
+                    speed: 0.5,
                 }
             },
             // Add more models here as needed

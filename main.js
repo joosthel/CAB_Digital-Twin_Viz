@@ -3,6 +3,11 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
+//Import Model Selection
+import {getFirstObjectWithName} from './ObjectSelection.js';
+import {getFirstCameraInScene, updateCameraAspect} from './ObjectSelection.js';
+
+//Import Model Loader
 import SceneModelLoader from './modelLoader.js';
 
 //Setup Container
@@ -110,6 +115,12 @@ resizeRendererToContainer();
 
 //Create Clock for animation timing
 const clock = new THREE.Clock();
+
+//Start Animation when Object is clicked
+document.addEventListener('click', onClick);
+function onClick(event) {
+    //Play Animation called "Door_open" from imported objects.
+}
 
 //Setup Animate Function to make everything visible
 function animate() {
