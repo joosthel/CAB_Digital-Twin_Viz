@@ -5,15 +5,18 @@ class SceneModelLoader {
     constructor(scene, basePath = './src/') {
         this.scene = scene;
         this.loader = new GLTFLoader().setPath(basePath);
+        this.mixers = [];
+        this.MaterialModifications = [];
+        this.DoorAction = null;
         this.models = [
             {
-                path: '240911_CAB.glb',
+                path: '241126_CAB_Exterior.gltf',
                 position: [-1.2, 0.045, 0],
                 scale: [1, 1, 1],
                 rotation: [0, 0, 0],
                 //Specify Material config here
                 materials: [{
-                    name: 'EX_Glas',
+                    name: 'EX_Window',
                     properties: {
                         transparent: true,
                         opacity: 0.3,
@@ -35,6 +38,73 @@ class SceneModelLoader {
                 }
             },
             {
+                path: '241126_CAB_Interior-S.gltf',
+                position: [-1.2, 0.045, 0],
+                scale: [1, 1, 1],
+                rotation: [0, 0, 0],
+                //Specify Material config here
+                materials: [{
+                    name: 'EX_Window',
+                    properties: {
+                        transparent: true,
+                        opacity: 0.3,
+                        roughness: 0.1
+                    }
+                },
+                {   
+                    name: 'Glas_Matrix',
+                    properties: {
+                        transparent: true,
+                        opacity: 0.3,
+                        roughness: 0.1
+                    }
+                }],
+                animations: {
+                    play: true,
+                    loop: THREE.LoopRepeat,
+                    speed: 1.0,
+                }
+            },
+            {
+                path: '241126_CAB_Tires_Back.gltf',
+                position: [-1.2, 0.045, 0],
+                scale: [1, 1, 1],
+                rotation: [0, 0, 0],
+                //Specify Material config here
+                materials: [],
+                animations: {
+                    play: true,
+                    loop: THREE.LoopRepeat,
+                    speed: 1.0,
+                }
+            },
+            {
+                path: '241126_CAB_Tires_FL.gltf',
+                position: [-1.2, 0.045, 0],
+                scale: [1, 1, 1],
+                rotation: [0, 0, 0],
+                //Specify Material config here
+                materials: [],
+                animations: {
+                    play: true,
+                    loop: THREE.LoopRepeat,
+                    speed: 1.0,
+                }
+            },
+            {
+                path: '241126_CAB_Tires_FR.gltf',
+                position: [-1.2, 0.045, 0],
+                scale: [1, 1, 1],
+                rotation: [0, 0, 0],
+                //Specify Material config here
+                materials: [],
+                animations: {
+                    play: true,
+                    loop: THREE.LoopRepeat,
+                    speed: 1.0,
+                }
+            },
+            {
                 path: '241202_CAB_Door.gltf',
                 position: [-1.2, 0.045, 0],
                 scale: [1, 1, 1],
@@ -49,15 +119,13 @@ class SceneModelLoader {
                     }
                 }],
                 animations: {
-                    play: true,
-                    //loop: THREE.LoopRepeat,
+                    play: false,
+                    loop: THREE.LoopRepeat,
                     speed: 0.5,
                 }
             },
             // Add more models here as needed
         ];
-        this.mixers = [];
-        this.MaterialModifications = [];
     }
 
     // Method to add more models to the configuration
