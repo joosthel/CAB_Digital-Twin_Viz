@@ -1,6 +1,17 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+// Define model paths
+const modelPaths = [
+    '241126_CAB_Exterior.gltf',
+    '241126_CAB_Interior-S.gltf',
+    '241126_CAB_Tires_Back.gltf',
+    '241126_CAB_Tires_FL.gltf',
+    '241126_CAB_Tires_FR.gltf',
+    '241202_CAB_Door.gltf',
+    // Add more model paths as needed
+];
+
 // Define common model properties
 const commonModelProperties = {
     position: [-1.2, 0.045, 0],
@@ -32,18 +43,6 @@ const materialProperties = [
         }
     }
 ];
-
-// Define model paths
-const modelPaths = [
-    '241126_CAB_Exterior.gltf',
-    '241126_CAB_Interior-S.gltf',
-    '241126_CAB_Tires_Back.gltf',
-    '241126_CAB_Tires_FL.gltf',
-    '241126_CAB_Tires_FR.gltf',
-    '241202_CAB_Door.gltf',
-    // Add more model paths as needed
-];
-
 class SceneModelLoader {
     constructor(scene, basePath = './src/') {
         this.scene = scene;
@@ -69,12 +68,27 @@ class SceneModelLoader {
                 this.setScale(object, model.scale);
                 this.setRotation(object, model.rotation);
                 this.applyMaterials(object, model.materials);
+                
+                // Set the layer based on the model file name
+                const layer = model.path === '241202_CAB_Door.gltf' ? 1 : 2;
+                object.traverse(child => {
+                    if (child.isMesh) {
+                        child.layers.set(layer);
+                    }
+                });
+
                 this.scene.add(object);
-                if (model.animations.play) {
-                    this.setupAnimations(gltf, model.animations);
-                }
+
+                const mixer = new THREE.AnimationMixer(model);
+                const animationClip = gltf.animations[0]; // Assuming the first animation clip
+
+                this.mixers.push(mixer);
             });
         });
+    }
+
+    getMixers() {
+        return this.mixers;
     }
 
     setPosition(object, position) {
@@ -108,6 +122,7 @@ class SceneModelLoader {
             action.timeScale = animationsConfig.speed;
         });
         this.mixers.push(mixer);
+        gltf.scene.userData.mixer = mixer;
     }
 
     playAnimation(name) {

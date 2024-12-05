@@ -44,6 +44,9 @@ const scene = new THREE.Scene();
 //Setup Camera
 const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 1000);
 camera.position.set (-4,2,-4);
+camera.layers.enable(1); //Door
+camera.layers.enable(2); //All Objects
+camera.layers.enable(3); //Ground Plane
 
 //Resize Camera to fit window
 window.addEventListener('resize', resizeRendererToContainer);
@@ -68,6 +71,12 @@ new RGBELoader()
         scene.environment = texture;
 });
 
+// ======Visible Objects======
+
+// Load 3D Models
+const modelLoader = new SceneModelLoader(scene);
+modelLoader.loadModels();
+
 // Create Ground Plane
 const groundGeometry = new THREE.PlaneGeometry(25, 25, 32, 32);
 groundGeometry.rotateX(-Math.PI / 2);
@@ -78,13 +87,42 @@ const groundMaterial = new THREE.MeshPhysicalMaterial({
 const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
 groundMesh.castShadow = false;
 groundMesh.receiveShadow = true;
+groundMesh.layers.set(3);
 scene.add(groundMesh);
 
-//Visible Objects
+// ====== Interactive UI ======
+const raycaster = new THREE.Raycaster();
+document.addEventListener('mousedown', onMouseDown);
 
-// Load 3D Models
-const modelLoader = new SceneModelLoader(scene);
-modelLoader.loadModels();
+let mixer;
+
+function onMouseDown(event) {
+    const coords = new THREE.Vector2(
+        (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
+        -(event.clientY/ renderer.domElement.clientHeight) * 2 + 1
+    );
+
+    raycaster.setFromCamera(coords, camera);
+    raycaster.layers.set(1); //Intersect only with Door
+
+    const intersections = raycaster.intersectObjects(scene.children, true);
+    //console.log(intersections[0]);
+
+    if (intersections.length > 0 && intersections[0].object.isMesh) {
+        const selectedObject = intersections[0].object;
+        const parent = selectedObject.parent;
+        const mixer = parent.userData.mixer;
+        const animationClip = parent.userData.animationClip;
+    
+        if (mixer && animationClip) {
+            const action = mixer.clipAction(animationClip);
+            action.play();
+            console.log(selectedObject);
+        } else {
+            console.error('Mixer or animation clip not found for:', selectedObject);
+        }
+    }
+};
 
 //Create Clock for animation timing
 const clock = new THREE.Clock();
@@ -94,6 +132,7 @@ function animate() {
     requestAnimationFrame(animate);
     //Animation
     const delta = clock.getDelta();
+    modelLoader.getMixers().forEach(mixer => mixer.update(delta));
     //Scene
     renderer.render(scene, camera);
     controls.update();
