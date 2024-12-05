@@ -3,12 +3,11 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import ThreeMeshUI from 'three-mesh-ui';
 
-//Import Local
+//Local imports
 import SceneModelLoader from './modelLoader.js';
 
-//Import Libs
-import ThreeMeshUI from 'three-mesh-ui';
 
 //Setup Container
 const container = document.getElementById('threejs-app');
@@ -17,7 +16,6 @@ const container = document.getElementById('threejs-app');
 const renderer = new THREE.WebGLRenderer({ antialias: true});
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-// renderer.setSize(window.innerWidth, window.innerHeight); //Not needed in Container setup
 renderer.setClearColor(0xF0F0F0);
 renderer.setPixelRatio(window.devicePixelRatio);
 
@@ -31,12 +29,27 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping
 
 container.appendChild(renderer.domElement);
 
+// Resize Renderer to Fit Container
+function resizeRendererToContainer() {
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+}
+
+
 //Setup Scene
 const scene = new THREE.Scene();
 
 //Setup Camera
 const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 1000);
 camera.position.set (-4,2,-4);
+
+//Resize Camera to fit window
+window.addEventListener('resize', resizeRendererToContainer);
+resizeRendererToContainer();
 
 // Add OrbitControls
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -61,7 +74,7 @@ new RGBELoader()
 const groundGeometry = new THREE.PlaneGeometry(25, 25, 32, 32);
 groundGeometry.rotateX(-Math.PI / 2);
 const groundMaterial = new THREE.MeshPhysicalMaterial({
-    color: 0xFAFAFA,
+    color: 0xA0A0A0,
     side: THREE.DoubleSide
 });
 const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
@@ -69,24 +82,9 @@ groundMesh.castShadow = false;
 groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
-//Create Lights
-
 // Load 3D Models
 const modelLoader = new SceneModelLoader(scene);
 modelLoader.loadModels();
-
-// Resize Renderer to Fit Container
-function resizeRendererToContainer() {
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-
-    renderer.setSize(width, height);
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-}
-
-window.addEventListener('resize', resizeRendererToContainer);
-resizeRendererToContainer();
 
 //Create Clock for animation timing
 const clock = new THREE.Clock();
