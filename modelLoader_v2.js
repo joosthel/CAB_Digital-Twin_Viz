@@ -8,7 +8,8 @@ const modelPaths = [
     '241126_CAB_Tires_Back.gltf',
     '241126_CAB_Tires_FL.gltf',
     '241126_CAB_Tires_FR.gltf',
-    '241202_CAB_Door.gltf',
+    '241206_CAB_Door.gltf',
+    '241206_CAB_Light-Door.gltf',
     // Add more model paths as needed
 ];
 
@@ -29,20 +30,62 @@ const materialProperties = [
     {
         name: 'EX_Window',
         properties: {
+            type: 'MeshPhysicalMaterial',
             transparent: true,
             opacity: 0.3,
-            roughness: 0.1
+            roughness: 0.1,
+            metalness: 0.9,
+            envMapIntensity: 2,
+            side: THREE.DoubleSide
         }
     },
     {
         name: 'Glas_Matrix',
         properties: {
+            type: 'MeshPhysicalMaterial',
             transparent: true,
             opacity: 0.3,
-            roughness: 0.1
+            roughness: 0.1,
+            metalness: 0.5,
+            envMapIntensity: 2,
+            side: THREE.DoubleSide
+        }
+    },
+    {
+        name: 'M_Light_Door',
+        properties: {
+            type: 'MeshPhysicalMaterial',
+            emissive: new THREE.Color(0xff0000),
+            emissiveIntensity: 100,
+            roughness: 1,
+            metalness: 0,
+        }
+    },
+    {
+        name: 'EX_Lack_Seite',
+        properties: {
+            type: 'MeshPhysicalMaterial',
+            transparent: false,
+            roughness: 0.1,
+            metalness: 1,
+            envMapIntensity: 2,
+            side: THREE.DoubleSide
+        }
+    }
+    ,
+    {
+        name: 'EX_Lack_Front',
+        properties: {
+            type: 'MeshPhysicalMaterial',
+            transparent: false,
+            roughness: 0.1,
+            metalness: 1,
+            envMapIntensity: 2,
+            side: THREE.DoubleSide
         }
     }
 ];
+
 class SceneModelLoader {
     constructor(scene, basePath = './src/') {
         this.scene = scene;
@@ -70,7 +113,7 @@ class SceneModelLoader {
                 this.applyMaterials(object, model.materials);
                 
                 // Set the layer based on the model file name
-                const layer = model.path === '241202_CAB_Door.gltf' ? 1 : 2;
+                const layer = model.path === '241206_CAB_Door.gltf' ? 1 : 2;
                 object.traverse(child => {
                     if (child.isMesh) {
                         child.layers.set(layer);
@@ -110,8 +153,25 @@ class SceneModelLoader {
     applyMaterials(object, materials) {
         materials.forEach(materialConfig => {
             object.traverse(child => {
-                if (child.isMesh && child.material.name === materialConfig.name) {
-                    Object.assign(child.material, materialConfig.properties);
+                if (child.isMesh && child.material.name === materialConfig.name) {                    
+                    // Always create new MeshStandardMaterial
+                    const standardMaterial = new THREE.MeshStandardMaterial({
+                        name: materialConfig.name,
+                        color: child.material.color || 0xffffff,
+                        map: child.material.map || null,
+                        normalMap: child.material.normalMap || null,
+                        side: THREE.DoubleSide,
+                        ...materialConfig.properties
+                    });
+                    
+                    // Enable shadows
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+
+                    // Assign new material
+                    child.material = standardMaterial;
+                    
+                    console.log('Applied material and shadows to:', child.name);
                 }
             });
         });

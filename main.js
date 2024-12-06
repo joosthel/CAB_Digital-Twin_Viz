@@ -13,21 +13,35 @@ import SceneModelLoader from './modelLoader_v2.js';
 const container = document.getElementById('threejs-app');
 
 // Setup Renderer
-const renderer = new THREE.WebGLRenderer({ antialias: true});
-renderer.outputColorSpace = THREE.SRGBColorSpace;
+// Set up WebGPU Renderer
+let renderer;
 
-renderer.setClearColor(0xF0F0F0);
-renderer.setPixelRatio(window.devicePixelRatio);
+async function initRenderer() {
+    console.log('Using WebGL renderer');
+    renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        powerPreference: "high-performance"
+    });
+    
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setClearColor(0xF0F0F0);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+    renderer.physicallyCorrectLights = true;
+    container.appendChild(renderer.domElement);
+}
 
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// Initialize Start
+async function init() {
+    await initRenderer();
+}
 
-renderer.setSize(container.clientWidth, container.clientHeight);
-
-renderer.outputEncoding = THREE.sRGBEncoding;
-renderer.toneMapping = THREE.ACESFilmicToneMapping
-
-container.appendChild(renderer.domElement);
+// Debug Renderer
+init().catch(console.error);
 
 // Resize Renderer to Fit Container
 function resizeRendererToContainer() {
@@ -80,6 +94,12 @@ new RGBELoader()
         scene.background = '#F0F0F0';
         scene.environment = texture;
 });
+
+// Directional Light
+const dirLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+dirLight.position.set(2, 5, 2);
+dirLight.castShadow = true;
+scene.add(dirLight);
 
 
 // ====== Geometry ======
