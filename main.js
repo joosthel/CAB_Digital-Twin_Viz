@@ -8,6 +8,7 @@ import ThreeMeshUI from 'three-mesh-ui';
 //Local imports
 import SceneModelLoader from './modelLoader_v2.js';
 
+// ====== ThreeJS Render Setup ======
 //Setup Container
 const container = document.getElementById('threejs-app');
 
@@ -38,6 +39,12 @@ function resizeRendererToContainer() {
     camera.updateProjectionMatrix();
 }
 
+//Create Clock for animation timing
+const clock = new THREE.Clock();
+
+
+// ====== Scene Setup ======
+
 //Setup Scene
 const scene = new THREE.Scene();
 
@@ -62,9 +69,10 @@ controls.maxPolarAngle = Math.PI / 2;
 //controls.autoRotateSpeed = 1;
 
 
+// ====== Lighting Setup ======
+
 // HDR Environment Map
 let envmaploader = new THREE.PMREMGenerator(renderer);
-
 new RGBELoader()
     .setPath('./src/')
     .load('urban_street_01_4k.hdr', function (texture) {
@@ -73,11 +81,12 @@ new RGBELoader()
         scene.environment = texture;
 });
 
-// ======Visible Objects======
+
+// ====== Geometry ======
 
 // Load 3D Models
 const modelLoader = new SceneModelLoader(scene);
-modelLoader.loadModels();
+//modelLoader.loadModels();
 
 // Test Geometry
     /*
@@ -103,11 +112,10 @@ groundMesh.receiveShadow = true;
 groundMesh.layers.set(3);
 scene.add(groundMesh);
 
+
 // ====== Interactive UI ======
 const raycaster = new THREE.Raycaster();
 document.addEventListener('mousedown', onMouseDown);
-
-let mixer;
 
 function onMouseDown(event) {
     const coords = new THREE.Vector2(
@@ -119,26 +127,33 @@ function onMouseDown(event) {
     raycaster.layers.set(1); //Intersect only with Door
 
     const intersections = raycaster.intersectObjects(scene.children, true);
-    //console.log(intersections[0]);
 
     if (intersections.length > 0 && intersections[0].object.isMesh) {
         const selectedObject = intersections[0].object;
-        const parent = selectedObject.parent;
-        const mixer = parent.userData.mixer;
-        const animationClip = parent.userData.animationClip;
+        // Traverse up to find the root object with userData
+        let rootObject = selectedObject;
+        while (rootObject.parent && !rootObject.userData.mixer) {
+            rootObject = rootObject.parent;
+        }
+        
+        const mixer = rootObject.userData.mixer;
+        const animationClip = rootObject.userData.animationClip;
     
         if (mixer && animationClip) {
             const action = mixer.clipAction(animationClip);
+            action.reset();
+            action.setLoop(THREE.LoopOnce);
+            action.clampWhenFinished = true;
             action.play();
-            console.log(selectedObject);
+            console.log('Playing animation for:', selectedObject);
         } else {
-            console.error('Mixer or animation clip not found for:', selectedObject);
+            console.error('Mixer or animation clip not found for:', rootObject);
         }
     }
-};
+}
 
-//Create Clock for animation timing
-const clock = new THREE.Clock();
+
+// ====== Animation and Export ======
 
 //Setup Animate Function to make everything visible
 function animate() {

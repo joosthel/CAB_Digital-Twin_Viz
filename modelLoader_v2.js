@@ -77,12 +77,16 @@ class SceneModelLoader {
                     }
                 });
 
-                this.scene.add(object);
-
-                const mixer = new THREE.AnimationMixer(model);
-                const animationClip = gltf.animations[0]; // Assuming the first animation clip
+                // Create mixer for the scene, not the model
+                const mixer = new THREE.AnimationMixer(object);
+                // Store mixer and animation clip in the object's userData
+                object.userData.mixer = mixer;
+                if (gltf.animations.length > 0) {
+                    object.userData.animationClip = gltf.animations[0];
+                }
 
                 this.mixers.push(mixer);
+                this.scene.add(object);
             });
         });
     }
