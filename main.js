@@ -127,9 +127,9 @@ const DOOR_STATES = {
 
 // Door Animation configuration for opening and closing
 const ANIMATION_CONFIG = {
-    DURATION: 1000, // milliseconds
+    DURATION: 3000, // milliseconds
     FORWARD_SCALE: 1,
-    REVERSE_SCALE: -1
+    REVERSE_SCALE: -0.25
 };
 
 // Handler for door animation with state management
