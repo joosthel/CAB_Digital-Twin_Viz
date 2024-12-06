@@ -117,20 +117,106 @@ scene.add(groundMesh);
 const raycaster = new THREE.Raycaster();
 document.addEventListener('mousedown', onMouseDown);
 
+// Door State Management
+const DOOR_STATES = {
+    CLOSED: 'CLOSED',
+    OPEN: 'OPEN',
+    OPENING: 'OPENING',
+    CLOSING: 'CLOSING'
+};
+
+// Door Animation configuration for opening and closing
+const ANIMATION_CONFIG = {
+    DURATION: 1000, // milliseconds
+    FORWARD_SCALE: 1,
+    REVERSE_SCALE: -1
+};
+
+// Handler for door animation with state management
+function handleDoorAnimation(rootObject, mixer, animationClip) {
+    if (isAnimating(rootObject)) {
+        console.log('Door is busy:', getDoorState(rootObject));
+        return;
+    }
+
+    const action = setupAnimationAction(mixer, animationClip);
+    const currentState = getDoorState(rootObject) || DOOR_STATES.CLOSED;
+    
+    if (currentState === DOOR_STATES.CLOSED) {
+        openDoor(rootObject, action);
+    } else if (currentState === DOOR_STATES.OPEN) {
+        closeDoor(rootObject, action);
+    }
+}
+
+// Setup Animation with default settings
+function setupAnimationAction(mixer, clip) {
+    const action = mixer.clipAction(clip);
+    action.clampWhenFinished = true;
+    action.setLoop(THREE.LoopOnce);
+    return action;
+}
+
+//Inititate opening animation
+function openDoor(rootObject, action) {
+    console.log('Opening door...');
+    setDoorState(rootObject, DOOR_STATES.OPENING);
+    action.reset();
+    action.time = 0;
+    action.timeScale = ANIMATION_CONFIG.FORWARD_SCALE;
+    action.play();
+    
+    setTimeout(() => {
+        setDoorState(rootObject, DOOR_STATES.OPEN);
+        console.log('Door is now open');
+    }, ANIMATION_CONFIG.DURATION);
+}
+
+// Initiate closing animation
+function closeDoor(rootObject, action) {
+    console.log('Closing door...');
+    setDoorState(rootObject, DOOR_STATES.CLOSING);
+    action.reset();
+    action.time = action._clip.duration;
+    action.timeScale = ANIMATION_CONFIG.REVERSE_SCALE;
+    action.play();
+    
+    setTimeout(() => {
+        setDoorState(rootObject, DOOR_STATES.CLOSED);
+        console.log('Door is now closed');
+    }, ANIMATION_CONFIG.DURATION);
+}
+
+// State Management Helpers
+function getDoorState(object) {
+    return object.userData.doorState;
+}
+
+function setDoorState(object, state) {
+    object.userData.doorState = state;
+}
+
+function isAnimating(object) {
+    const state = getDoorState(object);
+    return state === DOOR_STATES.OPENING || state === DOOR_STATES.CLOSING;
+}
+
+//  Event handler
 function onMouseDown(event) {
+    // Mouse position to normalized device coordinates
     const coords = new THREE.Vector2(
         (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
-        -(event.clientY/ renderer.domElement.clientHeight) * 2 + 1
+        -(event.clientY / renderer.domElement.clientHeight) * 2 + 1
     );
 
     raycaster.setFromCamera(coords, camera);
-    raycaster.layers.set(1); //Intersect only with Door
+    raycaster.layers.set(1); //Only detect objects on layer 1 (door)
 
     const intersections = raycaster.intersectObjects(scene.children, true);
 
     if (intersections.length > 0 && intersections[0].object.isMesh) {
         const selectedObject = intersections[0].object;
-        // Traverse up to find the root object with userData
+        // Find the root object with animation data 
         let rootObject = selectedObject;
         while (rootObject.parent && !rootObject.userData.mixer) {
             rootObject = rootObject.parent;
@@ -140,28 +226,27 @@ function onMouseDown(event) {
         const animationClip = rootObject.userData.animationClip;
     
         if (mixer && animationClip) {
-            const action = mixer.clipAction(animationClip);
-            action.reset();
-            action.setLoop(THREE.LoopOnce);
-            action.clampWhenFinished = true;
-            action.play();
-            console.log('Playing animation for:', selectedObject);
-        } else {
-            console.error('Mixer or animation clip not found for:', rootObject);
+            handleDoorAnimation(rootObject, mixer, animationClip);
         }
     }
 }
 
-
-// ====== Animation and Export ======
-
-//Setup Animate Function to make everything visible
+//Animation Loop; updates all animations and handles state changes
 function animate() {
     requestAnimationFrame(animate);
-    //Animation
     const delta = clock.getDelta();
-    modelLoader.getMixers().forEach(mixer => mixer.update(delta));
-    //Scene
+    modelLoader.getMixers().forEach(mixer => {
+        mixer.update(delta);
+        mixer.getRoot().traverse(obj => {
+            if (getDoorState(obj) === DOOR_STATES.CLOSING) {
+                const action = mixer.clipAction(obj.userData.animationClip);
+                action.time -= delta;
+                if (action.time <= 0) {
+                    action.paused = true;
+                }
+            }
+        });
+    });
     renderer.render(scene, camera);
     controls.update();
 }
