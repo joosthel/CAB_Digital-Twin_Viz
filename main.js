@@ -56,9 +56,11 @@ resizeRendererToContainer();
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; // Enable smooth movement
 controls.dampingFactor = 0.05;
+controls.target.set(0,0.8,0);
+controls.maxPolarAngle = Math.PI / 2;
 //controls.autoRotate = true;
 //controls.autoRotateSpeed = 1;
-controls.target.set(0,0.8,0);
+
 
 // HDR Environment Map
 let envmaploader = new THREE.PMREMGenerator(renderer);
@@ -76,6 +78,17 @@ new RGBELoader()
 // Load 3D Models
 const modelLoader = new SceneModelLoader(scene);
 modelLoader.loadModels();
+
+// Test Geometry
+    /*
+    const ballGeo = new THREE.SphereGeometry(1.5, 64, 64);
+    const ballMaterial = new THREE.MeshStandardMaterial({ color: 0xFF0000 });
+    const ballMesh = new THREE.Mesh(ballGeo, ballMaterial);
+    ballMesh.position.set(0, 1, 0);
+    ballMesh.scale.set(1, 0.75, 1);
+    ballMesh.layers.set(3);
+    scene.add(ballMesh);
+    */
 
 // Create Ground Plane
 const groundGeometry = new THREE.PlaneGeometry(25, 25, 32, 32);
