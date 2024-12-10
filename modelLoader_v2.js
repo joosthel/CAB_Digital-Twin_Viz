@@ -9,6 +9,7 @@ const modelPaths = [
     '241126_CAB_Tires_FL.gltf',
     '241126_CAB_Tires_FR.gltf',
     '241206_CAB_Door.gltf',
+    '241210_CAB_Rolling-Chassis.gltf',
     '241206_CAB_Light-Door.gltf',
     // Add more model paths as needed
 ];
