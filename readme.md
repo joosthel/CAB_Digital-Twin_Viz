@@ -1,8 +1,8 @@
 Digital Twin Application for the INYO CAB
 
 To-Do:
-- [ ] Separate Models into parts (Wheels, Exterior, Interior, Tür)
-- [ ] Animate Door (in 3d Model)
-- [ ] Model Import (separate parts)
-- [ ] Add Controll Buttons (for example to open Door)
-- [ ] MQTT Integration
+#TODO Implement EventListener
+#TODO Setup (for now) empty EventListener
+#TODO PropertyChanger
+#TODO EventHandler (for larger changes, like showing or hiding geometry; animation)
+#TODO Develop scalable program
