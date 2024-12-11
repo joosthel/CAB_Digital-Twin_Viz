@@ -6,7 +6,7 @@ import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import ThreeMeshUI from 'three-mesh-ui';
 
 //Local imports
-import SceneModelLoader from './modelLoader_v2.js';
+import SceneModelLoader from '../js/modelLoader_v2.js';
 
 // ====== ThreeJS Render Setup ======
 //Setup Container
@@ -88,7 +88,7 @@ controls.maxPolarAngle = Math.PI / 2;
 // HDR Environment Map
 let envmaploader = new THREE.PMREMGenerator(renderer);
 new RGBELoader()
-    .setPath('./src/')
+    .setPath('./assets/models/')
     .load('urban_street_01_4k.hdr', function (texture) {
         texture.mapping = THREE.EquirectangularReflectionMapping;
         scene.background = '#F0F0F0';

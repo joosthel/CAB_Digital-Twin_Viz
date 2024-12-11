@@ -98,7 +98,7 @@ const materialProperties = [
 ];
 
 class SceneModelLoader {
-    constructor(scene, basePath = './src/') {
+    constructor(scene, basePath = './assets/models/') {
         this.scene = scene;
         this.loader = new GLTFLoader().setPath(basePath);
         this.mixers = [];

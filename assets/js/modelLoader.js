@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 class SceneModelLoader {
-    constructor(scene, basePath = './src/') {
+    constructor(scene, basePath = '../assets/models/') {
         this.scene = scene;
         this.loader = new GLTFLoader().setPath(basePath);
         this.mixers = [];
