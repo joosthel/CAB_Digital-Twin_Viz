@@ -68,23 +68,33 @@ const materialProperties = [
             type: 'MeshPhysicalMaterial',
             transparent: false,
             roughness: 0.1,
-            metalness: 1,
+            metalness: 0.8,
             envMapIntensity: 2,
             side: THREE.DoubleSide
         }
-    }
-    ,
+    },
     {
         name: 'EX_Lack_Front',
         properties: {
             type: 'MeshPhysicalMaterial',
             transparent: false,
             roughness: 0.1,
+            metalness: 0.8,
+            envMapIntensity: 2,
+            side: THREE.DoubleSide
+        }
+    },
+    {
+        name: 'Radkappen',
+        properties: {
+            type: 'MeshPhysicalMaterial',
+            transparent: false,
+            roughness: 0.8,
             metalness: 1,
             envMapIntensity: 2,
             side: THREE.DoubleSide
         }
-    }
+    },
 ];
 
 class SceneModelLoader {

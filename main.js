@@ -101,6 +101,10 @@ dirLight.position.set(2, 5, 2);
 dirLight.castShadow = true;
 scene.add(dirLight);
 
+// Ambient Light
+const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
+scene.add(ambientLight);
+
 
 // ====== Geometry ======
 
