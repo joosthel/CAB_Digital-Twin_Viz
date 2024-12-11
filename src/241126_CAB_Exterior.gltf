@@ -328,23 +328,10 @@
 		},
 		{
 			"doubleSided":true,
-			"emissiveFactor":[
-				1,
-				1,
-				1
-			],
-			"emissiveTexture":{
-				"index":1
-			},
-			"extensions":{
-				"KHR_materials_emissive_strength":{
-					"emissiveStrength":10
-				}
-			},
 			"name":"LED-Matrix",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
-					"index":2
+					"index":1
 				},
 				"metallicFactor":0,
 				"roughnessFactor":0.20000000298023224
@@ -555,24 +542,20 @@
 			"source":0
 		},
 		{
-			"sampler":1,
-			"source":1
-		},
-		{
-			"sampler":1,
+			"sampler":0,
 			"source":1
 		}
 	],
 	"images":[
 		{
 			"mimeType":"image/png",
-			"name":"Kennzeichen_Innovations-Flughafen",
-			"uri":"Kennzeichen_Innovations-Flughafen.png"
+			"name":"INYO_Kennzeichen",
+			"uri":"INYO_Kennzeichen.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"INYO_Logo_Rohversion_weiss",
-			"uri":"INYO_Logo_Rohversion_weiss.png"
+			"name":"INYO_Logo_wei\u00df_square",
+			"uri":"INYO_Logo_wei%C3%9F_square.png"
 		}
 	],
 	"accessors":[
@@ -1284,7 +1267,7 @@
 		{
 			"bufferView":90,
 			"componentType":5126,
-			"count":52,
+			"count":448,
 			"max":[
 				1199.606201171875,
 				916.5978393554688,
@@ -1300,32 +1283,32 @@
 		{
 			"bufferView":91,
 			"componentType":5126,
-			"count":52,
+			"count":448,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":92,
 			"componentType":5126,
-			"count":52,
+			"count":448,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":93,
 			"componentType":5121,
-			"count":52,
+			"count":448,
 			"normalized":true,
 			"type":"VEC4"
 		},
 		{
 			"bufferView":94,
 			"componentType":5126,
-			"count":52,
+			"count":448,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":95,
 			"componentType":5123,
-			"count":54,
+			"count":486,
 			"type":"SCALAR"
 		},
 		{
@@ -1919,82 +1902,78 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":624,
+			"byteLength":5376,
 			"byteOffset":11674836,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":624,
-			"byteOffset":11675460,
+			"byteLength":5376,
+			"byteOffset":11680212,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":416,
-			"byteOffset":11676084,
+			"byteLength":3584,
+			"byteOffset":11685588,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":208,
-			"byteOffset":11676500,
+			"byteLength":1792,
+			"byteOffset":11689172,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":624,
-			"byteOffset":11676708,
+			"byteLength":5376,
+			"byteOffset":11690964,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":108,
-			"byteOffset":11677332,
+			"byteLength":972,
+			"byteOffset":11696340,
 			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":12396,
-			"byteOffset":11677440,
+			"byteOffset":11697312,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":12396,
-			"byteOffset":11689836,
+			"byteOffset":11709708,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":8264,
-			"byteOffset":11702232,
+			"byteOffset":11722104,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":4132,
-			"byteOffset":11710496,
+			"byteOffset":11730368,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":12396,
-			"byteOffset":11714628,
+			"byteOffset":11734500,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":2688,
-			"byteOffset":11727024,
+			"byteOffset":11746896,
 			"target":34963
 		}
 	],
 	"samplers":[
-		{
-			"magFilter":9729,
-			"minFilter":9987
-		},
 		{
 			"magFilter":9729,
 			"minFilter":9987,
@@ -2004,7 +1983,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":11729712,
+			"byteLength":11749584,
 			"uri":"241126_CAB_Exterior.bin"
 		}
 	]
