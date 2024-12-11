@@ -142,11 +142,26 @@ const raycaster = new THREE.Raycaster();
 document.addEventListener('mousedown', onMouseDown);
 
 // Door State Management
-const DOOR_STATES = {
+export const DOOR_STATES = {
     CLOSED: 'CLOSED',
     OPEN: 'OPEN',
     OPENING: 'OPENING',
     CLOSING: 'CLOSING'
+};
+
+export const DOOR_LIGHTS = {
+    L_OPENING: {
+        color: new THREE.Color(0x00ff00), // Green
+        intensity: 100
+    },
+    L_CLOSING: {
+        color: new THREE.Color(0xff0000), // Red
+        intensity: 100
+    },
+    L_INACTIVE: {
+        color: new THREE.Color(0x000000), // Off
+        intensity: 0
+    }
 };
 
 // Door Animation configuration for opening and closing
@@ -227,33 +242,67 @@ function isAnimating(object) {
 
 //  Event handler
 function onMouseDown(event) {
-    // Mouse position to normalized device coordinates
     const coords = new THREE.Vector2(
         (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
         -(event.clientY / renderer.domElement.clientHeight) * 2 + 1
     );
 
     raycaster.setFromCamera(coords, camera);
-    raycaster.layers.set(1); //Only detect objects on layer 1 (door)
+    raycaster.layers.set(1);
 
     const intersections = raycaster.intersectObjects(scene.children, true);
 
     if (intersections.length > 0 && intersections[0].object.isMesh) {
-        const selectedObject = intersections[0].object;
-        // Find the root object with animation data 
-        let rootObject = selectedObject;
-        while (rootObject.parent && !rootObject.userData.mixer) {
-            rootObject = rootObject.parent;
-        }
-        
-        const mixer = rootObject.userData.mixer;
-        const animationClip = rootObject.userData.animationClip;
-    
-        if (mixer && animationClip) {
-            handleDoorAnimation(rootObject, mixer, animationClip);
+        // Find the door object directly in the scene
+        let doorObject = null;
+        scene.traverse((object) => {
+            // Look for the object loaded from CAB_Door.gltf
+            if (object.userData.mixer && object.userData.animationClip) {
+                doorObject = object;
+            }
+        });
+
+        if (doorObject) {
+            handleDoorAnimation(doorObject, doorObject.userData.mixer, doorObject.userData.animationClip);
         }
     }
 }
+
+// Update Door Light Material Helper
+function updateDoorLightMat(color, intensity) {
+    // Array of object names to update
+    const objectNames = ["Door_Button_1", "Lichtstreifen"];
+    
+    objectNames.forEach(name => {
+        const mesh = scene.getObjectByName(name);
+
+        if (mesh) {
+            mesh.traverse((child) => {
+                if (child.isMesh) {
+                    // If material is an array
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach((mat, index) => {
+                            if (mat.name === "M_Light_Door") {
+                                mat.emissive.setHex(color);
+                                mat.emissiveIntensity = intensity;
+                                mat.needsUpdate = true;
+                            }
+                        });
+                    } 
+                    // If single material
+                    else if (child.material?.name === "M_Light_Door") {
+                        child.material.emissive.setHex(color);
+                        child.material.emissiveIntensity = intensity;
+                        child.material.needsUpdate = true;
+                    }
+                }
+            });
+        }
+    });
+}
+
+let lightTimer = 0;
+let blinkIntervall = 15;
 
 //Animation Loop; updates all animations and handles state changes
 function animate() {
@@ -262,12 +311,48 @@ function animate() {
     modelLoader.getMixers().forEach(mixer => {
         mixer.update(delta);
         mixer.getRoot().traverse(obj => {
+            if (getDoorState(obj)) {
+                const doorState = getDoorState(obj);
+                
+                if (doorState === DOOR_STATES.OPENING) {
+                    //console.log('Door is opening...');
+                    lightTimer += delta; // Add time from animation loop
+                    if (Math.sin(lightTimer * blinkIntervall) > 0) { // Adjust 5 to control blink speed
+                        updateDoorLightMat(0x00FF00, 1); // Bright green
+                    } else {
+                        updateDoorLightMat(0x00FF00, 0.2); // Dim green
+                    }
+                }
+                if (doorState === DOOR_STATES.OPEN) {
+                    //console.log('Door is open...');
+                    updateDoorLightMat(0xFFFFFF, 1); // White
+                    lightTimer = 0; // Reset timer
+                }
+                if (doorState === DOOR_STATES.CLOSING) {
+                    //console.log('Door is closing...');
+                    lightTimer += delta;
+                    if (Math.sin(lightTimer * blinkIntervall) > 0) {
+                        updateDoorLightMat(0xFF0000, 1); // Bright red
+                    } else {
+                        updateDoorLightMat(0xFF0000, 0.2); // Dim red
+                    }
+                }
+                if (doorState === DOOR_STATES.CLOSED) {
+                    //console.log('Door is close...');
+                    updateDoorLightMat(0xAAAAAA, 1); // Gray
+                    lightTimer = 0; // Reset timer
+                }
+            }
+
             if (getDoorState(obj) === DOOR_STATES.CLOSING) {
                 const action = mixer.clipAction(obj.userData.animationClip);
                 action.time -= delta;
                 if (action.time <= 0) {
                     action.paused = true;
                 }
+            }
+            if (getDoorState(obj) === DOOR_STATES.OPENING) {
+                const action = mixer.clipAction(obj.userData.animationClip);
             }
         });
     });

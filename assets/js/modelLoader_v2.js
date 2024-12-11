@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+
+
 // Define model paths
 const modelPaths = [
     '241126_CAB_Exterior.gltf',
@@ -8,9 +10,10 @@ const modelPaths = [
     '241126_CAB_Tires_Back.gltf',
     '241126_CAB_Tires_FL.gltf',
     '241126_CAB_Tires_FR.gltf',
-    '241206_CAB_Door.gltf',
+    '241211_CAB_Door.gltf',
     '241210_CAB_Rolling-Chassis.gltf',
     '241206_CAB_Light-Door.gltf',
+    '241211_CAB_Door_Button.gltf'
     // Add more model paths as needed
 ];
 
@@ -124,7 +127,7 @@ class SceneModelLoader {
                 this.applyMaterials(object, model.materials);
                 
                 // Set the layer based on the model file name
-                const layer = model.path === '241206_CAB_Door.gltf' ? 1 : 2;
+                const layer = (model.path === '241211_CAB_Door.gltf' || model.path === '241211_CAB_Door_Button.gltf') ? 1 : 2;
                 object.traverse(child => {
                     if (child.isMesh) {
                         child.layers.set(layer);
